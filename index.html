@@ -9,13 +9,13 @@
   <body>
     <div class="container">
       <img src="logo.png" alt="Apex Bank" class="logo" />
-      <h1>Login to Apex Bank</h1>
+      <h1>Welcome to Apex Bank</h1>
 
       <form id="loginForm">
-        <input type="text" id="username" placeholder="Username" required />
+        <input type="text" id="loginUsername" placeholder="Username" required />
         <input
           type="password"
-          id="pin"
+          id="loginPin"
           placeholder="PIN"
           maxlength="4"
           required
@@ -23,8 +23,11 @@
         <button type="submit">Login</button>
       </form>
 
-      <p class="signup-text">
-        Don't have an account? <a href="signup.html">Create one</a>
+      <p class="mt-6 text-center">
+        Don't have an account?
+        <a href="signup.html" class="text-apex-gold hover:underline"
+          >Sign up here</a
+        >
       </p>
     </div>
 

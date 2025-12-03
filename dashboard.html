@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apex Bank | Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav>
+      <p class="welcome">Welcome back</p>
+      <img src="logo.png" alt="Logo" class="logo" />
+      <button id="logoutBtn" class="login__btn logout">Logout</button>
+    </nav>
+
+    <main class="app">
+      <div class="balance">
+        <div>
+          <p class="balance__label">Current balance</p>
+          <p class="balance__date">As of <span class="date">--</span></p>
+        </div>
+        <p class="balance__value">R0.00</p>
+      </div>
+
+      <section class="transact">
+        <div class="prior">
+          <div class="movements"></div>
+        </div>
+
+        <div class="post">
+          <div class="summary">
+            <p class="summary__label">In</p>
+            <p class="summary__value summary__value--in">R0.00</p>
+            <p class="summary__label">Out</p>
+            <p class="summary__value summary__value--out">R0.00</p>
+            <p class="summary__label">Interest</p>
+            <p class="summary__value summary__value--interest">R0.00</p>
+            <button class="btn--sort">&downarrow; SORT</button>
+          </div>
+
+          <div class="operation operation--transfer">
+            <h2>Transfer money</h2>
+            <form class="form form--transfer">
+              <input
+                type="text"
+                class="form__input form__input--to"
+                placeholder="Recipient username"
+              />
+              <input
+                type="number"
+                class="form__input form__input--amount"
+                placeholder="Amount in ZAR"
+              />
+              <button class="form__btn form__btn--transfer">&rarr;</button>
+            </form>
+          </div>
+
+          <div class="operation operation--loan">
+            <h2>Request loan</h2>
+            <form class="form form--loan">
+              <input
+                type="number"
+                class="form__input form__input--loan-amount"
+                placeholder="Loan amount"
+              />
+              <button class="form__btn form__btn--loan">&rarr;</button>
+            </form>
+          </div>
+
+          <div class="operation operation--close">
+            <h2>Close account</h2>
+            <form class="form form--close">
+              <input
+                type="text"
+                class="form__input form__input--user"
+                placeholder="Confirm username"
+              />
+              <input
+                type="password"
+                maxlength="4"
+                class="form__input form__input--pin"
+                placeholder="Confirm PIN"
+              />
+              <button class="form__btn form__btn--close">&rarr;</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <p class="logout-timer">
+        You will be logged out in <span class="timer">01:00</span>
+      </p>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

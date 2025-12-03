@@ -1,0 +1,359 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap");
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  font-size: 62.5%; /* 1rem = 10px */
+}
+body {
+  font-family: "Inter", sans-serif;
+  color: #eee;
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  min-height: 100vh;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* ====================== LOGIN / REGISTRATION PAGE ====================== */
+.container {
+  max-width: 500px;
+  margin: 6vh auto;
+  padding: 4rem 3rem;
+  background: rgba(15, 15, 26, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  text-align: center;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7);
+}
+.logo {
+  height: 8rem;
+  margin-bottom: 2rem;
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  transition: transform 0.4s;
+}
+.logo:hover {
+  transform: scale(1.1) rotate(8deg);
+}
+h1,
+h2 {
+  font-family: "Playfair Display", serif;
+  background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 2.5rem;
+  font-size: 3.6rem;
+}
+input[type="text"],
+input[type="password"],
+input[type="date"] {
+  width: 100%;
+  padding: 1.6rem 2rem;
+  margin: 1rem 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 1.7rem;
+  transition: all 0.3s;
+}
+input:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+  background: rgba(255, 215, 0, 0.05);
+}
+button {
+  width: 100%;
+  padding: 1.8rem;
+  margin-top: 2rem;
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(255, 215, 0, 0.5);
+}
+button:active {
+  transform: translateY(-2px);
+}
+.pin-display {
+  font-size: 5rem;
+  font-weight: 900;
+  letter-spacing: 1.2rem;
+  margin: 3rem 0;
+  background: linear-gradient(90deg, #00c8c8, #ffd700, #00c8c8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.timer {
+  color: #ff1744;
+  font-weight: bold;
+  font-size: 1.8rem;
+} /* ====================== MAIN DASHBOARD ====================== */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 6rem;
+  background: rgba(15, 15, 26, 0.8);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.welcome {
+  font-size: 2.4rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.login__input {
+  padding: 1.2rem 2rem;
+  border: none;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.6rem;
+  width: 18rem;
+  border: 1px solid transparent;
+}
+.login__input:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+.login__btn {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 5.5rem;
+  height: 5.5rem;
+  font-size: 2.6rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+}
+.login__btn:hover {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 20px 50px rgba(255, 215, 0, 0.6);
+}
+.app {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  margin: 4rem 6rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+}
+.balance {
+  grid-column: 1 / -1;
+  background: rgba(20, 20, 40, 0.7);
+  backdrop-filter: blur(20px);
+  padding: 3.5rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+.balance__label {
+  font-size: 2.4rem;
+  color: #aaa;
+  margin-bottom: 1rem;
+}
+.balance__date {
+  font-size: 1.8rem;
+  color: #00c8c8;
+  margin-top: 0.5rem;
+}
+.balance__value {
+  font-size: 6.5rem;
+  font-weight: 800;
+  font-family: "Playfair Display", serif;
+  background: linear-gradient(90deg, #ffd700, #ffffff, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+}
+.transact {
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+.movements {
+  background: rgba(15, 15, 30, 0.8);
+  backdrop-filter: blur(15px);
+  border-radius: 18px;
+  max-height: 55vh;
+  overflow-y: auto;
+  border: 1px solid rgba(0, 200, 200, 0.25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+.movements__row {
+  padding: 2.8rem 4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.3s;
+}
+.movements__row:hover {
+  background: rgba(255, 215, 0, 0.08);
+  transform: translateX(12px);
+}
+.movements__type {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  letter-spacing: 1.2px;
+}
+.movements__type--deposit {
+  background: linear-gradient(45deg, #00c853, #64dd17);
+}
+.movements__type--withdrawal {
+  background: linear-gradient(45deg, #ff1744, #f50057);
+}
+.movements__date {
+  font-size: 1.5rem;
+  color: #00c8c8;
+}
+.movements__value {
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+.summary {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-around;
+  padding: 3rem;
+  background: rgba(0, 200, 200, 0.12);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  border: 1px solid rgba(0, 200, 200, 0.3);
+}
+.summary__value {
+  font-size: 3.2rem;
+  font-weight: 700;
+}
+.summary__value--in {
+  color: #00c853;
+}
+.summary__value--out {
+  color: #ff1744;
+}
+.summary__value--interest {
+  color: #ffd700;
+}
+.btn--sort {
+  background: none;
+  border: none;
+  color: #ffd700;
+  font-size: 2.4rem;
+  cursor: pointer;
+  transition: all 0.4s;
+}
+.btn--sort:hover {
+  transform: scale(1.4) rotate(180deg);
+}
+.operation {
+  padding: 3rem;
+  border-radius: 18px;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(15px);
+  border: 1px solid transparent;
+}
+.operation--transfer {
+  background: rgba(156, 39, 176, 0.15);
+  border-color: rgba(156, 39, 176, 0.4);
+}
+.operation--loan {
+  background: rgba(0, 200, 200, 0.15);
+  border-color: rgba(0, 200, 200, 0.4);
+}
+.operation--close {
+  background: rgba(244, 67, 54, 0.15);
+  border-color: rgba(244, 67, 54, 0.4);
+}
+.operation h2 {
+  margin-bottom: 2rem;
+  font-size: 2.6rem;
+  background: linear-gradient(90deg, #ffd700, #00c8c8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.form__input {
+  width: 100%;
+  padding: 1.6rem 2rem;
+  margin-bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.7rem;
+}
+.form__btn {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  color: #000;
+  padding: 1.6rem 3rem;
+  border: none;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.form__btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(255, 215, 0, 0.5);
+}
+.logout-timer {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 2.2rem;
+  color: #ffd700;
+  margin-top: 3rem;
+}
+.timer {
+  font-weight: 900;
+  color: #ff1744;
+} /* Responsive */
+@media (max-width: 968px) {
+  .app {
+    grid-template-columns: 1fr;
+    margin: 2rem;
+  }
+  nav {
+    padding: 1.5rem 3rem;
+    flex-direction: column;
+    gap: 2rem;
+  }
+} /* Final Touch */
+body::after {
+  content: "Apex Bank © 2025 | Banking for Kings";
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.4rem;
+  color: rgba(255, 215, 0, 0.6);
+  letter-spacing: 4px;
+  font-weight: 300;
+}

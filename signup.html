@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apex Bank | Signup</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <img src="logo.png" alt="Apex Bank" class="logo" />
+      <h1>Create Your Apex Account</h1>
+
+      <form id="signupForm">
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="text" id="surname" placeholder="Surname" required />
+        <input
+          type="text"
+          id="idNumber"
+          placeholder="ID Number (13 digits)"
+          maxlength="13"
+          required
+        />
+        <input type="date" id="dob" required />
+        <input
+          type="text"
+          id="nationality"
+          placeholder="Nationality"
+          value="South African"
+          required
+        />
+        <button type="submit">Register & Generate PIN</button>
+      </form>
+
+      <div id="pinSection" style="display: none">
+        <h2>Your Secure PIN</h2>
+        <p>Save this PIN — you will need it to log in</p>
+        <div class="pin-display" id="generatedPin"></div>
+        <input
+          type="password"
+          id="pinInput"
+          placeholder="Enter PIN to continue"
+          maxlength="4"
+        />
+        <button id="loginBtn">Login to Apex Bank</button>
+        <p>Screen will reset in <span class="timer">01:00</span></p>
+      </div>
+
+      <p class="signup-text"><a href="index.html">Back to login</a></p>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

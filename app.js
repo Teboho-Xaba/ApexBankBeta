@@ -1,11 +1,5 @@
 "use strict";
 
-// =============================================
-// APEX BANK v8.0 — FINAL & FLAWLESS
-// Balance = Deposits + In − Withdrawals − Out
-// 100% Accurate Accounting
-// =============================================
-
 class BankUser {
   constructor(username, name, surname, dob, nationality = "South African") {
     this.username = username.toLowerCase().trim();
@@ -71,9 +65,7 @@ class BankAccount {
   }
 }
 
-// =============================================
-// APEX BANK CORE SYSTEM
-// =============================================
+// App
 class ApexBank {
   static currentUser = null;
   static timer = null;
@@ -165,7 +157,7 @@ class ApexBank {
       const userData = this.loadUser(username);
       if (!userData) return alert("User not found");
 
-      const user = Object.setPrototypeOf(userData, BankUser.prototype);
+      const user = this.restoreUser(userData);
 
       if (user.authenticate(pin)) {
         this.currentUser = user;
@@ -184,7 +176,7 @@ class ApexBank {
     const userData = this.loadUser(savedId);
     if (!userData) return this.logout();
 
-    this.currentUser = Object.setPrototypeOf(userData, BankUser.prototype);
+    this.currentUser = this.restoreUser(userData);
 
     this.render();
     this.startTimer(600, () => this.logout());
@@ -193,57 +185,96 @@ class ApexBank {
       .getElementById("logoutBtn")
       .addEventListener("click", () => this.logout());
 
-    // Transfer
-    document
-      .querySelector(".form--transfer")
-      .addEventListener("submit", (e) => {
-        e.preventDefault();
-        const to = document
-          .querySelector(".form__input--to")
-          .value.trim()
-          .toLowerCase();
-        const amount = +document.querySelector(".form__input--amount").value;
+    // UNIFIED TRANSACTIONS
+    const transactionType = document.getElementById("transactionType");
+    const amountInput = document.getElementById("transactionAmount");
+    const recipientInput = document.getElementById("recipientUsername");
+    const recipientContainer = document.getElementById("recipientContainer");
+    const pinInput = document.getElementById("transactionPin");
+    const submitBtn = document.getElementById("submitTransaction");
 
-        if (!to || amount <= 0) return alert("Enter valid amount");
-        const recipientData = this.loadUser(to);
-        if (!recipientData || to === this.currentUser.username)
-          return alert("Invalid recipient");
-        if (this.currentUser.accounts[0].balance < amount)
-          return alert("Insufficient funds");
+    transactionType.addEventListener("change", () => {
+      recipientContainer.style.display =
+        transactionType.value === "transfer" ? "block" : "none";
+    });
 
-        const recipient = Object.setPrototypeOf(
-          recipientData,
-          BankUser.prototype
-        );
+    submitBtn.addEventListener("click", () => {
+      const type = transactionType.value;
+      const amount = Number(amountInput.value);
+      const recipient = recipientInput.value.trim().toLowerCase();
+      const pin = pinInput.value;
 
-        this.currentUser.accounts[0].withdraw(amount, `Transfer to ${to}`);
-        recipient.accounts[0].deposit(
-          amount,
-          `Transfer from ${this.currentUser.username}`
-        );
+      if (!this.currentUser.authenticate(pin)) {
+        return alert("Incorrect PIN");
+      }
 
-        this.saveUser(recipient);
+      if (amount <= 0) return alert("Enter valid amount");
+
+      try {
+        if (type === "deposit") {
+          this.currentUser.accounts[0].deposit(amount, "Cash Deposit");
+          alert(`R${amount.toFixed(2)} deposited`);
+        } else if (type === "withdrawal") {
+          this.currentUser.accounts[0].withdraw(amount, "Cash Withdrawal");
+          alert(`R${amount.toFixed(2)} withdrawn`);
+        } else if (type === "transfer") {
+          if (!recipient) return alert("Enter recipient username");
+          if (recipient === this.currentUser.username)
+            return alert("Can't transfer to yourself");
+
+          const recipientData = this.loadUser(recipient);
+          if (!recipientData) return alert("Recipient not found");
+
+          const recipientUser = this.restoreUser(recipientData);
+
+          if (this.currentUser.accounts[0].balance < amount)
+            return alert("Insufficient funds");
+
+          this.currentUser.accounts[0].withdraw(
+            amount,
+            `Transfer to ${recipient}`
+          );
+          recipientUser.accounts[0].deposit(
+            amount,
+            `From ${this.currentUser.username}`
+          );
+
+          this.saveUser(recipientUser);
+          alert(`R${amount.toFixed(2)} sent to ${recipient}`);
+        }
+
         this.saveUser(this.currentUser);
         this.render();
         this.resetTimer();
-        alert(`R${amount.toFixed(2)} transferred to ${to}`);
-      });
+
+        amountInput.value = "";
+        recipientInput.value = "";
+        pinInput.value = "";
+      } catch (err) {
+        alert(err.message || "Transaction failed");
+      }
+    });
 
     // Loan
-    document.querySelector(".form--loan").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const amount = +document.querySelector(".form__input--loan-amount").value;
+    document.getElementById("requestLoanBtn").addEventListener("click", () => {
+      const amount = Number(document.getElementById("loanAmount").value);
+      const pin = document.getElementById("loanPin").value;
+
+      if (!this.currentUser.authenticate(pin)) return alert("Incorrect PIN");
+      if (amount <= 0) return alert("Enter valid amount");
+
       if (this.currentUser.accounts[0].requestLoan(amount)) {
         this.saveUser(this.currentUser);
         this.render();
         this.resetTimer();
         alert(`R${amount.toFixed(2)} loan approved!`);
+        document.getElementById("loanAmount").value = "";
+        document.getElementById("loanPin").value = "";
       } else {
-        alert("Loan declined – insufficient deposit history");
+        alert("Loan declined");
       }
     });
 
-    // Close Account
     document.querySelector(".form--close").addEventListener("submit", (e) => {
       e.preventDefault();
       const confirmUser = document
@@ -270,7 +301,15 @@ class ApexBank {
       .addEventListener("click", () => this.render(true));
   }
 
-  // ACCURATE BALANCE & SUMMARY
+  // OBJECTS WITH METHODS
+  static restoreUser(userData) {
+    const user = Object.setPrototypeOf(userData, BankUser.prototype);
+    user.accounts = user.accounts.map((acc) =>
+      Object.setPrototypeOf(acc, BankAccount.prototype)
+    );
+    return user;
+  }
+
   static render(sort = false) {
     if (!this.currentUser) return;
 
@@ -282,12 +321,10 @@ class ApexBank {
       this.locale
     ).format(new Date());
 
-    // Combine all transactions from both accounts
     const allTransactions = this.currentUser.accounts.flatMap(
       (acc) => acc.transactions
     );
-
-    let displayedTxns = sort
+    const displayedTxns = sort
       ? allTransactions.slice().sort((a, b) => b.amount - a.amount)
       : allTransactions
           .slice()
@@ -312,7 +349,6 @@ class ApexBank {
       container.insertAdjacentHTML("afterbegin", html);
     });
 
-    // TOTAL BALANCE — ACCURATE
     const totalBalance = this.currentUser.accounts.reduce(
       (sum, acc) => sum + acc.balance,
       0
@@ -320,7 +356,6 @@ class ApexBank {
     document.querySelector(".balance__value").textContent =
       this.formatCurrency(totalBalance);
 
-    // SUMMARY — IN / OUT / INTEREST
     const deposits = allTransactions
       .filter((t) => t.amount > 0)
       .reduce((s, t) => s + t.amount, 0);
@@ -329,7 +364,7 @@ class ApexBank {
         .filter((t) => t.amount < 0)
         .reduce((s, t) => s + t.amount, 0)
     );
-    const interest = deposits * 0.012; // 1.2%
+    const interest = deposits * 0.012;
 
     document.querySelector(".summary__value--in").textContent =
       this.formatCurrency(deposits);
@@ -386,9 +421,7 @@ class ApexBank {
 
   static saveUser(user) {
     const users = this.loadUsers();
-    const plainUser = structuredClone
-      ? structuredClone(user)
-      : JSON.parse(JSON.stringify(user));
+    const plainUser = JSON.parse(JSON.stringify(user));
     const i = users.findIndex((u) => u.username === user.username);
     if (i > -1) users[i] = plainUser;
     else users.push(plainUser);
@@ -410,7 +443,6 @@ class ApexBank {
   }
 }
 
-// START
 document.addEventListener("DOMContentLoaded", () => ApexBank.init());
 
-console.log("APEX BANK v8.0 — FINAL | Balance 100% Accurate | ZAR | R50 Bonus");
+console.log("APEX BANK v9.1 — FINAL & UNBREAKABLE | deposit() fixed");

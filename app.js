@@ -1,5 +1,11 @@
 "use strict";
 
+import { createClient } from "@supabase/supabase-js";
+const supabase = createClient(
+  "https://zgxidabaczjmpbzuzphl.supabase.co",
+  "sb_publishable_Ss0ekut9PMQGBPhEPzX2ew_vmIIALtn",
+);
+
 class BankUser {
   constructor(username, name, surname, dob, nationality = "South African") {
     this.username = username.toLowerCase().trim();
@@ -55,7 +61,7 @@ class BankAccount {
   requestLoan(amount) {
     if (amount <= 0) return false;
     const hasDeposit = this.transactions.some(
-      (t) => t.type === "deposit" && t.amount >= amount * 0.1
+      (t) => t.type === "deposit" && t.amount >= amount * 0.1,
     );
     if (hasDeposit) {
       this.deposit(amount, "Instant Loan Approved");
@@ -97,7 +103,7 @@ class ApexBank {
         document.getElementById("name").value,
         document.getElementById("surname").value,
         document.getElementById("dob").value,
-        document.getElementById("nationality").value
+        document.getElementById("nationality").value,
       );
 
       const cheque = new BankAccount("cheque");
@@ -232,11 +238,11 @@ class ApexBank {
 
           this.currentUser.accounts[0].withdraw(
             amount,
-            `Transfer to ${recipient}`
+            `Transfer to ${recipient}`,
           );
           recipientUser.accounts[0].deposit(
             amount,
-            `From ${this.currentUser.username}`
+            `From ${this.currentUser.username}`,
           );
 
           this.saveUser(recipientUser);
@@ -305,7 +311,7 @@ class ApexBank {
   static restoreUser(userData) {
     const user = Object.setPrototypeOf(userData, BankUser.prototype);
     user.accounts = user.accounts.map((acc) =>
-      Object.setPrototypeOf(acc, BankAccount.prototype)
+      Object.setPrototypeOf(acc, BankAccount.prototype),
     );
     return user;
   }
@@ -313,16 +319,15 @@ class ApexBank {
   static render(sort = false) {
     if (!this.currentUser) return;
 
-    document.querySelector(
-      ".welcome"
-    ).textContent = `Welcome back, ${this.currentUser.name}`;
+    document.querySelector(".welcome").textContent =
+      `Welcome back, ${this.currentUser.name}`;
     document.querySelector(".app").style.opacity = 1;
     document.querySelector(".date").textContent = new Intl.DateTimeFormat(
-      this.locale
+      this.locale,
     ).format(new Date());
 
     const allTransactions = this.currentUser.accounts.flatMap(
-      (acc) => acc.transactions
+      (acc) => acc.transactions,
     );
     const displayedTxns = sort
       ? allTransactions.slice().sort((a, b) => b.amount - a.amount)
@@ -337,13 +342,13 @@ class ApexBank {
       const html = `
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
-        i + 1
-      } ${type.toUpperCase()}</div>
+            i + 1
+          } ${type.toUpperCase()}</div>
           <div class="movements__date">${new Date(t.date).toLocaleDateString(
-            this.locale
+            this.locale,
           )}</div>
           <div class="movements__value">${this.formatCurrency(
-            Math.abs(t.amount)
+            Math.abs(t.amount),
           )}</div>
         </div>`;
       container.insertAdjacentHTML("afterbegin", html);
@@ -351,7 +356,7 @@ class ApexBank {
 
     const totalBalance = this.currentUser.accounts.reduce(
       (sum, acc) => sum + acc.balance,
-      0
+      0,
     );
     document.querySelector(".balance__value").textContent =
       this.formatCurrency(totalBalance);
@@ -362,7 +367,7 @@ class ApexBank {
     const withdrawals = Math.abs(
       allTransactions
         .filter((t) => t.amount < 0)
-        .reduce((s, t) => s + t.amount, 0)
+        .reduce((s, t) => s + t.amount, 0),
     );
     const interest = deposits * 0.012;
 

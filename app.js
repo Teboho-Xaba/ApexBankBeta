@@ -6,6 +6,192 @@ const supabase = createClient(
   "sb_publishable_Ss0ekut9PMQGBPhEPzX2ew_vmIIALtn",
 );
 
+// =============================================
+// ApexBankBeta - Supabase Integration
+// PIN-based auth with bcrypt hashing
+// =============================================
+
+const supabaseUrl = 'https://YOUR-PROJECT-REF.supabase.co';   // ← CHANGE THIS
+const supabaseAnonKey = 'YOUR-ANON-KEY-HERE';                 // ← CHANGE THIS
+
+const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+// Make supabase available globally if you have multiple JS files
+window.supabase = supabase;
+
+// ======================
+// PIN Helper Functions
+// ======================
+
+/**
+ * Hash a 4-digit PIN using bcryptjs
+ * @param {string} pin - Exactly 4 digits
+ * @returns {Promise<string>} bcrypt hash
+ */
+async function hashPIN(pin) {
+  if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+    throw new Error("PIN must be exactly 4 digits (0-9)");
+  }
+  
+  // saltRounds = 12 is a good balance for security vs speed in browser
+  const saltRounds = 12;
+  return bcrypt.hash(pin, saltRounds);
+}
+
+/**
+ * Verify entered PIN against stored hash
+ * @param {string} enteredPin 
+ * @param {string} storedHash 
+ * @returns {Promise<boolean>}
+ */
+async function verifyPIN(enteredPin, storedHash) {
+  if (!enteredPin || !storedHash) return false;
+  return bcrypt.compare(enteredPin, storedHash);
+}
+
+// ======================
+// Session Management
+// ======================
+
+/**
+ * Get currently logged in user from sessionStorage
+ */
+function getCurrentUser() {
+  const userStr = sessionStorage.getItem('apexbank_current_user');
+  return userStr ? JSON.parse(userStr) : null;
+}
+
+/**
+ * Save user to session (called after successful login)
+ */
+function setCurrentUser(user) {
+  sessionStorage.setItem('apexbank_current_user', JSON.stringify({
+    id: user.id,
+    username: user.username,
+    full_name: user.full_name || ''
+  }));
+}
+
+/**
+ * Logout - clear session
+ */
+function logoutUser() {
+  sessionStorage.removeItem('apexbank_current_user');
+  // You can also add: window.location.reload(); if needed
+}
+
+// ======================
+// Core Auth Functions
+// ======================
+
+/**
+ * Create New User (Signup)
+ */
+async function createNewUser(username, pin, fullName = "") {
+  try {
+    const cleanUsername = username.toLowerCase().trim();
+    
+    if (!cleanUsername || cleanUsername.length < 3) {
+      alert("Username must be at least 3 characters");
+      return null;
+    }
+
+    // 1. Hash PIN (never store plain text)
+    const pinHash = await hashPIN(pin);
+
+    // 2. Insert into users table
+    const { data, error } = await supabase
+      .from('users')
+      .insert({
+        username: cleanUsername,
+        pin_hash: pinHash,
+        full_name: fullName.trim()
+      })
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505' || error.message.includes('unique')) {
+        alert("❌ Username already exists. Please choose another one.");
+      } else {
+        console.error("Signup error:", error);
+        alert("❌ Error creating account: " + (error.message || "Unknown error"));
+      }
+      return null;
+    }
+
+    console.log("✅ User created:", data);
+    alert(`✅ Account created successfully!\n\nUsername: ${cleanUsername}\nYou can now log in.`);
+    return data;
+
+  } catch (err) {
+    console.error("Signup failed:", err);
+    alert("❌ Failed to create account. Please try again.");
+    return null;
+  }
+}
+
+/**
+ * Login User with PIN
+ */
+async function loginUser(username, pin) {
+  try {
+    const cleanUsername = username.toLowerCase().trim();
+
+    // 1. Fetch user by username
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, username, pin_hash, full_name')
+      .eq('username', cleanUsername)
+      .single();
+
+    if (error || !user) {
+      alert("❌ Invalid username or PIN");
+      return null;
+    }
+
+    // 2. Verify PIN
+    const isValid = await verifyPIN(pin, user.pin_hash);
+    
+    if (!isValid) {
+      alert("❌ Invalid username or PIN");
+      return null;
+    }
+
+    // 3. Login successful
+    setCurrentUser(user);
+    console.log("✅ Login successful for:", user.username);
+    
+    // You can redirect or trigger your dashboard load here
+    alert(`✅ Welcome back, ${user.full_name || user.username}!`);
+    
+    return user;
+
+  } catch (err) {
+    console.error("Login error:", err);
+    alert("❌ Login failed. Please try again.");
+    return null;
+  }
+}
+
+// ======================
+// Optional: Quick Test Functions (remove later)
+// ======================
+
+async function testCreateUser() {
+  await createNewUser("testuser", "1234", "Test User");
+}
+
+async function testLogin() {
+  await loginUser("testuser", "1234");
+}
+
+// Expose useful functions to window so you can call them from console or your buttons
+window.createNewUser = createNewUser;
+window.loginUser = loginUser;
+window.logoutUser = logoutUser;
+window.getCurrentUser = getCurrentUser;
+
 class BankUser {
   constructor(username, name, surname, dob, nationality = "South African") {
     this.username = username.toLowerCase().trim();
